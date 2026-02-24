@@ -13,13 +13,23 @@ import scipy.io as sio
 from backend.schema import FEATURE_NAMES_MODEL, INPUT_FACTOR
 
 BASE_DIR = Path(__file__).resolve().parents[1]
-MODEL_DIR = BASE_DIR / "web_AA" / "model"
-NORM_FILE = MODEL_DIR / "aa_norm.mat"
-MODEL_FILE = MODEL_DIR / "final_model.pkl"
+MODEL_DIR_CANDIDATES = [
+    BASE_DIR,
+]
 
 _MODEL: Optional[object] = None
 _ARR_MIN: Optional[np.ndarray] = None
 _ARR_MAX: Optional[np.ndarray] = None
+
+
+def _resolve_asset_path(filename: str) -> Path:
+    for directory in MODEL_DIR_CANDIDATES:
+        candidate = directory / filename
+        if candidate.exists():
+            return candidate
+
+    searched = ", ".join(str(path / filename) for path in MODEL_DIR_CANDIDATES)
+    raise FileNotFoundError(f"Missing file '{filename}'. Searched: {searched}")
 
 
 def _load_assets() -> None:
@@ -27,15 +37,13 @@ def _load_assets() -> None:
     if _MODEL is not None and _ARR_MIN is not None and _ARR_MAX is not None:
         return
 
-    if not NORM_FILE.exists():
-        raise FileNotFoundError(f"Missing normalization file: {NORM_FILE}")
-    if not MODEL_FILE.exists():
-        raise FileNotFoundError(f"Missing model file: {MODEL_FILE}")
+    norm_file = _resolve_asset_path("aa_norm.mat")
+    model_file = _resolve_asset_path("final_model.pkl")
 
-    mat = sio.loadmat(str(NORM_FILE))
+    mat = sio.loadmat(str(norm_file))
     _ARR_MIN = np.squeeze(mat["arr_min"]).astype(np.float64)
     _ARR_MAX = np.squeeze(mat["arr_max"]).astype(np.float64)
-    _MODEL = joblib.load(str(MODEL_FILE))
+    _MODEL = joblib.load(str(model_file))
 
 
 def _scale_input(raw_values: np.ndarray) -> np.ndarray:
@@ -64,4 +72,3 @@ def predict_probability(raw_values: np.ndarray) -> float:
     frame = pd.DataFrame(scaled, columns=FEATURE_NAMES_MODEL)
     prob = _MODEL.predict_proba(frame)
     return float(prob[0, 1])
-
