@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>원형탈모 예측 웹앱 (KR)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <main class="page">
+      <header class="hero panel fade-up">
+        <p class="hero-tag">Alopecia Areata KR Predictor</p>
+        <h1>건강검진 데이터를 이용한 원형탈모 예측</h1>
+        <p class="hero-sub">
+          정적 웹 페이지에서 입력을 받고, 배포된 Python API가 예측을 계산합니다.
+          사용자는 Python을 실행할 필요가 없습니다.
+        </p>
+        <div class="api-badge">
+          API Endpoint:
+          <code id="api-url">(loading)</code>
+        </div>
+      </header>
+
+      <section class="panel fade-up">
+        <div class="section-head">
+          <h2>환자 정보 입력</h2>
+          <p>모든 항목을 입력한 후 분석하기를 눌러주세요.</p>
+        </div>
+
+        <form id="prediction-form">
+          <div id="fields-grid" class="fields-grid"></div>
+          <p id="form-error" class="error-text" role="alert"></p>
+
+          <button id="submit-btn" type="submit" class="submit-btn">
+            분석하기
+          </button>
+        </form>
+      </section>
+
+      <section id="result-panel" class="panel fade-up hidden">
+        <div class="section-head">
+          <h2>예측 결과</h2>
+          <p>이 결과는 보조 정보이며, 진료를 대체하지 않습니다.</p>
+        </div>
+
+        <div class="result-grid">
+          <article class="result-card">
+            <h3>현재 상태</h3>
+            <p id="current-label" class="risk-label">-</p>
+            <p id="current-probability" class="risk-prob">-</p>
+          </article>
+
+          <article id="improved-card" class="result-card hidden">
+            <h3>개선 후 예상</h3>
+            <p id="improved-label" class="risk-label">-</p>
+            <p id="improved-probability" class="risk-prob">-</p>
+          </article>
+        </div>
+
+        <article id="recommendation-wrap" class="recommendation-wrap hidden">
+          <h3>권장 개선 항목</h3>
+          <ul id="recommendation-list"></ul>
+        </article>
+
+        <article>
+          <h3>입력 정보</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>항목</th>
+                  <th>입력값</th>
+                </tr>
+              </thead>
+              <tbody id="patient-info-body"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <script src="./config.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
+
